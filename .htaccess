@@ -1,0 +1,7 @@
+# Sécurité : la racine web doit être public/. Si le projet est servi depuis ce dossier
+# par erreur, on bloque les fichiers sensibles et on redirige le reste vers public/.
+Options -Indexes
+RewriteEngine On
+RewriteRule ^(config\.php|config\.sample\.php|cron\.php|README\.md|lib/|views/|data/|\.git) - [F,L]
+RewriteCond %{REQUEST_URI} !/public/
+RewriteRule ^(.*)$ public/$1 [L]
