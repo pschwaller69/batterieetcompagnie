@@ -1,7 +1,7 @@
 <h1>Accueil</h1>
 
 <?php if (!$smtpOk): ?>
-<div class="flash warn">L'envoi n'est pas encore configuré. <a href="<?= url('settings') ?>">Renseigner le serveur SMTP</a>.</div>
+<div class="flash warn">L'envoi n'est pas encore configuré. <?= is_admin() ? '<a href="' . url('settings') . '">Renseigner le serveur SMTP</a>.' : 'Contactez un administrateur.' ?></div>
 <?php endif; ?>
 
 <div class="tiles">

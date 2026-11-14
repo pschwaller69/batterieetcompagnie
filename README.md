@@ -8,7 +8,7 @@ Outil d'envoi de mailings pour l'association **Batterie & Compagnie**. Il est au
 - **Désinscription** : lien en pied de mail, plus les en-têtes `List-Unsubscribe` et `List-Unsubscribe-Post` (désinscription « en un clic » exigée par Gmail et Yahoo). Un contact désinscrit n'est jamais réabonné par un import.
 - **Suivi** : envoyés, échecs (une adresse inexistante passe automatiquement « en erreur ») et ouvertures (indicatives).
 - **Contacts Microsoft 365** : synchronisation directe des contacts Outlook des boîtes de l'association (Microsoft Graph), avec les catégories Outlook converties en listes.
-- **Plusieurs utilisateurs**, journal d'activité.
+- **Plusieurs utilisateurs** avec deux rôles : Administrateur (accès complet) et Rédacteur (contacts, listes, imports, campagnes) ; journal d'activité.
 
 Stack : PHP 8.1+ (extensions pdo_sqlite, openssl, mbstring, zip, curl) et SQLite. Aucune base MySQL à créer, aucune dépendance à installer : PHPMailer et l'éditeur Quill sont inclus dans le dépôt.
 

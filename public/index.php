@@ -37,7 +37,7 @@ case 'setup':
         } elseif (strlen($pass) < 10) {
             $error = 'Mot de passe : 10 caractères minimum.';
         } else {
-            q('INSERT INTO users (email, name, password_hash) VALUES (?, ?, ?)', [$email, post('name'), password_hash($pass, PASSWORD_DEFAULT)]);
+            q('INSERT INTO users (email, name, password_hash, role) VALUES (?, ?, ?, \'admin\')', [$email, post('name'), password_hash($pass, PASSWORD_DEFAULT)]);
             session_regenerate_id(true);
             $_SESSION['uid'] = (int)db()->lastInsertId();
             if (setting('base_url') === '') {
@@ -529,7 +529,7 @@ case 'upload_image':
 /* ===================== Réglages / utilisateurs ===================== */
 
 case 'settings':
-    $user = require_login();
+    $user = require_admin();
     if ($isPost) {
         $a = post('action');
         if ($a === 'save') {
@@ -571,17 +571,20 @@ case 'settings':
     break;
 
 case 'users':
-    $me = require_login();
+    $me = require_admin();
     if ($isPost) {
         $a = post('action');
+        $admins = (int)q_val("SELECT COUNT(*) FROM users WHERE role = 'admin'");
         if ($a === 'create') {
             $email = normalize_email(post('email'));
             $pass = (string)($_POST['password'] ?? '');
+            $role = post('role') === 'admin' ? 'admin' : 'editor';
             if (!valid_email($email) || strlen($pass) < 10) {
                 flash('E-mail valide et mot de passe de 10 caractères minimum requis.', 'err');
             } else {
                 try {
-                    q('INSERT INTO users (email, name, password_hash) VALUES (?, ?, ?)', [$email, post('name'), password_hash($pass, PASSWORD_DEFAULT)]);
+                    q('INSERT INTO users (email, name, password_hash, role) VALUES (?, ?, ?, ?)', [$email, post('name'), password_hash($pass, PASSWORD_DEFAULT), $role]);
+                    log_activity("Utilisateur ajouté : $email (" . role_label($role) . ')');
                     flash('Utilisateur ajouté.');
                 } catch (PDOException $e) {
                     flash('Cet utilisateur existe déjà.', 'err');
@@ -595,9 +598,21 @@ case 'users':
                 q('UPDATE users SET password_hash = ? WHERE id = ?', [password_hash($pass, PASSWORD_DEFAULT), (int)post('id')]);
                 flash('Mot de passe modifié.');
             }
+        } elseif ($a === 'role') {
+            $id = (int)post('id');
+            $role = post('role') === 'admin' ? 'admin' : 'editor';
+            if ($id === (int)$me['id'] && $role !== 'admin') {
+                flash('Vous ne pouvez pas retirer vos propres droits d\'administrateur.', 'err');
+            } else {
+                q('UPDATE users SET role = ? WHERE id = ?', [$role, $id]);
+                flash('Rôle modifié : ' . role_label($role) . '.');
+            }
         } elseif ($a === 'delete') {
+            $target = q_one('SELECT role FROM users WHERE id = ?', [(int)post('id')]);
             if ((int)post('id') === (int)$me['id']) {
                 flash('Vous ne pouvez pas supprimer votre propre compte.', 'err');
+            } elseif ($target && $target['role'] === 'admin' && $admins <= 1) {
+                flash('Il doit rester au moins un administrateur.', 'err');
             } else {
                 q('DELETE FROM users WHERE id = ?', [(int)post('id')]);
                 flash('Utilisateur supprimé.');
@@ -609,7 +624,7 @@ case 'users':
     break;
 
 case 'm365':
-    require_login();
+    require_admin();
     $probe = null;
     if ($isPost) {
         $a = post('action');
@@ -664,6 +679,31 @@ case 'm365':
             ? q('SELECT l.id, l.name, (SELECT COUNT(*) FROM contact_list WHERE list_id = l.id) AS n FROM lists l WHERE l.id IN (' . implode(',', $ids) . ') ORDER BY l.name')->fetchAll()
             : [],
     ]);
+    break;
+
+case 'account':
+    $me = require_login();
+    if ($isPost) {
+        $u = q_one('SELECT * FROM users WHERE id = ?', [$me['id']]);
+        $new = (string)($_POST['new_password'] ?? '');
+        if (post('action') === 'name') {
+            q('UPDATE users SET name = ? WHERE id = ?', [post('name'), $me['id']]);
+            flash('Nom enregistré.');
+        } elseif (!password_verify((string)($_POST['current_password'] ?? ''), $u['password_hash'])) {
+            sleep(1);
+            flash('Mot de passe actuel incorrect.', 'err');
+        } elseif (strlen($new) < 10) {
+            flash('Le nouveau mot de passe doit faire 10 caractères minimum.', 'err');
+        } elseif ($new !== (string)($_POST['confirm_password'] ?? '')) {
+            flash('La confirmation ne correspond pas.', 'err');
+        } else {
+            q('UPDATE users SET password_hash = ? WHERE id = ?', [password_hash($new, PASSWORD_DEFAULT), $me['id']]);
+            session_regenerate_id(true);
+            flash('Mot de passe modifié.');
+        }
+        redirect('account');
+    }
+    render('account', ['me' => $me]);
     break;
 
 case 'activity':

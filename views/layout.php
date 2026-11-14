@@ -12,16 +12,17 @@
 <header class="top">
     <a class="brand" href="<?= url('dashboard') ?>"><span class="logo">B&amp;C</span> Mailing</a>
     <nav>
-        <?php foreach ([
-            'dashboard' => 'Accueil', 'campaigns' => 'Campagnes', 'contacts' => 'Contacts',
-            'lists' => 'Listes', 'import' => 'Importer', 'm365' => 'Microsoft 365', 'settings' => 'Réglages',
-        ] as $k => $label):
+        <?php $nav = ['dashboard' => 'Accueil', 'campaigns' => 'Campagnes', 'contacts' => 'Contacts', 'lists' => 'Listes', 'import' => 'Importer'];
+        if ($u && is_admin($u)) {
+            $nav += ['m365' => 'Microsoft 365', 'settings' => 'Réglages'];
+        }
+        foreach ($nav as $k => $label):
             $active = $p === $k || ($k === 'campaigns' && in_array($p, ['campaign', 'campaign_edit'], true)) || ($k === 'contacts' && $p === 'contact'); ?>
             <a href="<?= url($k) ?>" class="<?= $active ? 'on' : '' ?>"><?= $label ?></a>
         <?php endforeach; ?>
     </nav>
     <?php if ($u): ?>
-    <div class="me"><?= h($u['name'] ?: $u['email']) ?> · <a href="<?= url('logout') ?>">Déconnexion</a></div>
+    <div class="me"><a href="<?= url('account') ?>" title="Mon compte"><?= h($u['name'] ?: $u['email']) ?></a><?= is_admin($u) ? '' : ' <span class="badge">Rédacteur</span>' ?> · <a href="<?= url('logout') ?>">Déconnexion</a></div>
     <?php endif; ?>
 </header>
 <main>

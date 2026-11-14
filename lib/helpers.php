@@ -53,7 +53,7 @@ function current_user(): ?array
     }
     static $u = null;
     if ($u === null) {
-        $u = q_one('SELECT id, email, name FROM users WHERE id = ?', [$_SESSION['uid']]);
+        $u = q_one('SELECT id, email, name, role FROM users WHERE id = ?', [$_SESSION['uid']]);
     }
     return $u;
 }
@@ -65,6 +65,28 @@ function require_login(): array
         redirect('login');
     }
     return $u;
+}
+
+function is_admin(?array $u = null): bool
+{
+    $u ??= current_user();
+    return $u !== null && ($u['role'] ?? 'admin') === 'admin';
+}
+
+/** Pages réservées aux administrateurs (réglages, Microsoft 365, utilisateurs). */
+function require_admin(): array
+{
+    $u = require_login();
+    if (!is_admin($u)) {
+        flash('Cette page est réservée aux administrateurs.', 'err');
+        redirect('dashboard');
+    }
+    return $u;
+}
+
+function role_label(string $r): string
+{
+    return $r === 'editor' ? 'Rédacteur' : 'Administrateur';
 }
 
 function csrf_token(): string

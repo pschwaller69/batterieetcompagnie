@@ -116,6 +116,9 @@ SQL,
         2 => <<<SQL
 ALTER TABLE contacts ADD COLUMN source TEXT NOT NULL DEFAULT 'manual';
 SQL,
+        3 => <<<SQL
+ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'admin'; -- admin | editor
+SQL,
     ];
     foreach ($migrations as $v => $sql) {
         if ($version < $v) {
