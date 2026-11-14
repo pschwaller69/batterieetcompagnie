@@ -80,6 +80,8 @@ Le tableau de bord affiche l'heure du dernier passage.
 
 cPanel → Git Version Control → **Gérer** → *Pull or Deploy* → **Update from Remote**. `config.php` et `data/` ne sont jamais écrasés.
 
+**Vérifier la version installée** : elle est affichée en bas de chaque page (ex. `v1.2.0 · 7d25fdd`) et détaillée dans **Réglages → Version installée**. Le code à 7 caractères est le commit déployé ; il doit correspondre au dernier commit visible sur [GitHub](https://github.com/pschwaller69/batterieetcompagnie/commits/main). L'historique des versions est dans [CHANGELOG.md](CHANGELOG.md).
+
 ## 3. Cadence d'envoi et limites o2switch
 
 L'hébergeur plafonne le nombre de mails sortants par heure. **Demandez au support o2switch la limite exacte de votre offre** et réglez le « Max / heure » en dessous (100 par défaut).

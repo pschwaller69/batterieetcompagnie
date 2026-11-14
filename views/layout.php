@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title><?= h(APP_NAME) ?></title>
-<link rel="stylesheet" href="assets/app.css?v=1">
+<link rel="stylesheet" href="assets/app.css?v=<?= h(APP_VERSION) ?>">
 </head>
 <body>
 <header class="top">
@@ -30,7 +30,10 @@
 <?php endforeach; ?>
 <?= $content ?>
 </main>
+<footer class="foot">
+    <?= h(APP_NAME) ?> · <a href="<?= url('settings') ?>#version" title="Détails de la version"><?= h(app_version_label()) ?></a>
+</footer>
 <script>window.CSRF = <?= json_encode(csrf_token()) ?>;</script>
-<script src="assets/app.js?v=1"></script>
+<script src="assets/app.js?v=<?= h(APP_VERSION) ?>"></script>
 </body>
 </html>

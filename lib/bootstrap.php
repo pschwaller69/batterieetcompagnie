@@ -16,6 +16,7 @@ if (($GLOBALS['CONFIG']['app_secret'] ?? '') === '' || $GLOBALS['CONFIG']['app_s
 }
 date_default_timezone_set($GLOBALS['CONFIG']['timezone'] ?? 'Europe/Paris');
 
+require __DIR__ . '/version.php';
 require __DIR__ . '/PHPMailer/Exception.php';
 require __DIR__ . '/PHPMailer/PHPMailer.php';
 require __DIR__ . '/PHPMailer/SMTP.php';

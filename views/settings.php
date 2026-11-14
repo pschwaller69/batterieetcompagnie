@@ -71,3 +71,17 @@
     <p class="small"><a href="<?= url('users') ?>">Gérer les utilisateurs</a> · <a href="<?= url('activity') ?>">Journal d'activité</a></p>
 </section>
 </div>
+
+<?php $b = app_build(); $repo = 'https://github.com/pschwaller69/batterieetcompagnie'; ?>
+<section class="card" id="version">
+    <h2>Version installée</h2>
+    <table class="tbl small">
+        <tr><td>Version</td><td><strong>v<?= h(APP_VERSION) ?></strong> — <a href="<?= $repo ?>/blob/main/CHANGELOG.md" target="_blank" rel="noopener">voir les nouveautés</a></td></tr>
+        <tr><td>Commit déployé</td><td><?= $b ? '<a href="' . $repo . '/commit/' . h($b['hash']) . '" target="_blank" rel="noopener"><code>' . h($b['short']) . '</code></a>' : '<span class="muted">inconnu (dossier .git absent)</span>' ?></td></tr>
+        <?php if ($b && $b['date']): ?><tr><td>Dernière mise à jour</td><td><?= h($b['date']) ?></td></tr><?php endif; ?>
+        <tr><td>Base de données</td><td>schéma n° <?= (int)db()->query('PRAGMA user_version')->fetchColumn() ?></td></tr>
+        <tr><td>PHP</td><td><?= h(PHP_VERSION) ?><?= function_exists('curl_init') ? '' : ' — <span class="badge failed">extension curl absente</span>' ?></td></tr>
+    </table>
+    <p class="small muted">Pour vérifier que vous êtes à jour : le commit ci-dessus doit être le même que le dernier commit affiché sur
+        <a href="<?= $repo ?>/commits/main" target="_blank" rel="noopener">GitHub</a>. Sinon : cPanel → Git Version Control → Gérer → « Update from Remote ».</p>
+</section>

@@ -10,5 +10,6 @@
     <label>E-mail<input type="email" name="email" required autofocus></label>
     <label>Mot de passe<input type="password" name="password" required></label>
     <button class="btn primary">Se connecter</button>
+    <p class="small muted" style="text-align:center;margin:14px 0 0"><?= h(app_version_label()) ?></p>
 </form>
 </body></html>

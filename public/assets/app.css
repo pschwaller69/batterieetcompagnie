@@ -137,3 +137,6 @@ details .mini{margin-top:8px}
 .ql-snow .ql-tooltip a.ql-action::after{content:'Modifier'}
 .ql-snow .ql-tooltip a.ql-remove::before{content:'Retirer'}
 .ql-snow .ql-tooltip::before{content:'Ouvrir :'}
+
+.foot{max-width:1200px;margin:0 auto;padding:0 24px 24px;font-size:12px;color:var(--muted);text-align:right}
+.foot a{color:var(--muted)}
