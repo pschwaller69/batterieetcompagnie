@@ -8,7 +8,7 @@ header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: same-origin');
 
 start_session();
-$page = preg_replace('/[^a-z_]/', '', (string)($_GET['p'] ?? 'dashboard')) ?: 'dashboard';
+$page = preg_replace('/[^a-z0-9_]/', '', (string)($_GET['p'] ?? 'dashboard')) ?: 'dashboard';
 $isPost = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST';
 if ($isPost) {
     check_csrf();
@@ -606,6 +606,64 @@ case 'users':
         redirect('users');
     }
     render('users', ['users' => q('SELECT * FROM users ORDER BY email')->fetchAll(), 'me' => $me]);
+    break;
+
+case 'm365':
+    require_login();
+    $probe = null;
+    if ($isPost) {
+        $a = post('action');
+        if ($a === 'save') {
+            foreach (array_keys(M365_SETTING_DEFAULTS) as $k) {
+                if ($k === 'm365_client_secret') {
+                    if (post($k) !== '') {
+                        save_setting($k, (string)$_POST[$k]);
+                        save_setting('m365_token', '');
+                    }
+                    continue;
+                }
+                if (in_array($k, ['m365_categories_as_lists', 'm365_remove_missing'], true)) {
+                    save_setting($k, post($k) === '1' ? '1' : '0');
+                    continue;
+                }
+                if (array_key_exists($k, $_POST)) {
+                    $v = post($k);
+                    if ($k === 'm365_auto_hours') {
+                        $v = (string)max(0, (int)$v);
+                    }
+                    save_setting($k, $v);
+                }
+            }
+            save_setting('m365_token', '');
+            flash('Réglages Microsoft 365 enregistrés.');
+            redirect('m365');
+        }
+        try {
+            if (!m365_configured()) {
+                throw new RuntimeException('Renseignez d\'abord le tenant, l\'ID d\'application, le secret et au moins une boîte.');
+            }
+            if ($a === 'test') {
+                $probe = m365_probe();
+            } elseif ($a === 'sync') {
+                $r = m365_sync();
+                flash($r['message']);
+                redirect('m365');
+            }
+        } catch (\Throwable $e) {
+            flash($e->getMessage(), 'err');
+            if ($a === 'sync') {
+                save_setting('m365_last_result', 'Échec : ' . $e->getMessage());
+                redirect('m365');
+            }
+        }
+    }
+    render('m365', [
+        'probe' => $probe,
+        'mainList' => q_one("SELECT l.id, (SELECT COUNT(*) FROM contact_list WHERE list_id = l.id) AS n FROM lists l WHERE l.name = ?", [setting('m365_list_name')]),
+        'catLists' => ($ids = array_map('intval', json_decode(setting('m365_category_lists') ?: '[]', true) ?: []))
+            ? q('SELECT l.id, l.name, (SELECT COUNT(*) FROM contact_list WHERE list_id = l.id) AS n FROM lists l WHERE l.id IN (' . implode(',', $ids) . ') ORDER BY l.name')->fetchAll()
+            : [],
+    ]);
     break;
 
 case 'activity':

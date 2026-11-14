@@ -14,7 +14,7 @@
     <nav>
         <?php foreach ([
             'dashboard' => 'Accueil', 'campaigns' => 'Campagnes', 'contacts' => 'Contacts',
-            'lists' => 'Listes', 'import' => 'Importer', 'settings' => 'Réglages',
+            'lists' => 'Listes', 'import' => 'Importer', 'm365' => 'Microsoft 365', 'settings' => 'Réglages',
         ] as $k => $label):
             $active = $p === $k || ($k === 'campaigns' && in_array($p, ['campaign', 'campaign_edit'], true)) || ($k === 'contacts' && $p === 'contact'); ?>
             <a href="<?= url($k) ?>" class="<?= $active ? 'on' : '' ?>"><?= $label ?></a>

@@ -21,6 +21,21 @@ const SETTING_DEFAULTS = [
     'footer_html' => '',
 ];
 
+/** Réglages de la synchronisation Microsoft 365 (page dédiée). */
+const M365_SETTING_DEFAULTS = [
+    'm365_tenant' => '',                 // ID d'annuaire (tenant) ou domaine
+    'm365_client_id' => '',              // ID d'application (client)
+    'm365_client_secret' => '',          // chiffré
+    'm365_mailboxes' => 'info@batterieetcompagnie.fr',
+    'm365_folders' => '',                // vide = tous les dossiers de contacts
+    'm365_list_name' => 'Microsoft 365',
+    'm365_categories_as_lists' => '1',
+    'm365_remove_missing' => '1',
+    'm365_auto_hours' => '24',           // 0 = manuel uniquement
+];
+
+const SECRET_SETTINGS = ['smtp_pass', 'm365_client_secret'];
+
 function setting(string $key): string
 {
     static $cache = null;
@@ -34,8 +49,8 @@ function setting(string $key): string
         $cache = null;
         return '';
     }
-    $v = $cache[$key] ?? SETTING_DEFAULTS[$key] ?? '';
-    if ($key === 'smtp_pass') {
+    $v = $cache[$key] ?? SETTING_DEFAULTS[$key] ?? M365_SETTING_DEFAULTS[$key] ?? '';
+    if (in_array($key, SECRET_SETTINGS, true)) {
         return decrypt_value($v);
     }
     return $v;
@@ -43,7 +58,7 @@ function setting(string $key): string
 
 function save_setting(string $key, string $value): void
 {
-    if ($key === 'smtp_pass') {
+    if (in_array($key, SECRET_SETTINGS, true)) {
         $value = encrypt_value($value);
     }
     q('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value', [$key, $value]);

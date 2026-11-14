@@ -55,7 +55,7 @@
 <tr>
     <td class="chk"><input type="checkbox" name="ids[]" value="<?= $r['id'] ?>"></td>
     <td><a href="<?= url('contact', ['id' => $r['id']]) ?>"><?= h(trim($r['last_name'] . ' ' . $r['first_name'])) ?: '<em class="muted">(sans nom)</em>' ?></a></td>
-    <td><?= h($r['email']) ?></td>
+    <td><?= h($r['email']) ?><?= ($r['source'] ?? '') === 'm365' ? ' <span class="badge" title="Importé depuis Microsoft 365">M365</span>' : '' ?></td>
     <td class="small"><?= h($r['list_names'] ?? '') ?></td>
     <td><span class="badge <?= h($r['status']) ?>"><?= status_label($r['status']) ?></span></td>
 </tr>

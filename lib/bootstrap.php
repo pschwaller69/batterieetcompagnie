@@ -25,6 +25,7 @@ require __DIR__ . '/settings.php';
 require __DIR__ . '/mailer.php';
 require __DIR__ . '/queue.php';
 require __DIR__ . '/importer.php';
+require __DIR__ . '/m365.php';
 
 function config(string $key, $default = null)
 {

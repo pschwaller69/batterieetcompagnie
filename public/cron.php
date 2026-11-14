@@ -16,6 +16,7 @@ if ($key === '' || !hash_equals($key, (string)($_GET['key'] ?? ''))) {
 ignore_user_abort(true);
 set_time_limit(300);
 save_setting('last_cron_run', now());
+m365_maybe_autosync();
 $r = process_queue();
 header('Content-Type: text/plain; charset=utf-8');
 echo $r['message'];

@@ -12,5 +12,8 @@ if (PHP_SAPI !== 'cli') {
 require __DIR__ . '/lib/bootstrap.php';
 
 save_setting('last_cron_run', now());
+if (($m = m365_maybe_autosync()) !== null) {
+    echo '[' . now() . '] ' . $m . PHP_EOL;
+}
 $r = process_queue();
 echo '[' . now() . '] ' . $r['message'] . PHP_EOL;

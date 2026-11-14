@@ -113,6 +113,9 @@ CREATE TABLE activity (
     message TEXT NOT NULL
 );
 SQL,
+        2 => <<<SQL
+ALTER TABLE contacts ADD COLUMN source TEXT NOT NULL DEFAULT 'manual';
+SQL,
     ];
     foreach ($migrations as $v => $sql) {
         if ($version < $v) {

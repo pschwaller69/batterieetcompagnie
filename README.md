@@ -7,9 +7,10 @@ Outil d'envoi de mailings pour l'association **Batterie & Compagnie**. Il est au
 - **Envoi cadencé** : une file d'attente est traitée par un cron, avec un plafond par heure glissante pour rester sous la limite de l'hébergeur.
 - **Désinscription** : lien en pied de mail, plus les en-têtes `List-Unsubscribe` et `List-Unsubscribe-Post` (désinscription « en un clic » exigée par Gmail et Yahoo). Un contact désinscrit n'est jamais réabonné par un import.
 - **Suivi** : envoyés, échecs (une adresse inexistante passe automatiquement « en erreur ») et ouvertures (indicatives).
+- **Contacts Microsoft 365** : synchronisation directe des contacts Outlook des boîtes de l'association (Microsoft Graph), avec les catégories Outlook converties en listes.
 - **Plusieurs utilisateurs**, journal d'activité.
 
-Stack : PHP 8.1+ et SQLite. Aucune base MySQL à créer, aucune dépendance à installer : PHPMailer et l'éditeur Quill sont inclus dans le dépôt.
+Stack : PHP 8.1+ (extensions pdo_sqlite, openssl, mbstring, zip, curl) et SQLite. Aucune base MySQL à créer, aucune dépendance à installer : PHPMailer et l'éditeur Quill sont inclus dans le dépôt.
 
 ```
 cron.php            traitement de la file (lancé par le cron, en ligne de commande)
@@ -53,7 +54,7 @@ Envoyer depuis un **sous-domaine dédié** (`m.`) isole la réputation des maili
    ```bash
    php -r "echo bin2hex(random_bytes(32));"
    ```
-4. Vérifier que **PHP ≥ 8.1** est sélectionné, avec les extensions `pdo_sqlite`, `openssl`, `mbstring` et `zip` (cPanel, menu **Sélecteur de version PHP**).
+4. Vérifier que **PHP ≥ 8.1** est sélectionné, avec les extensions `pdo_sqlite`, `openssl`, `mbstring`, `zip` et `curl` (cPanel, menu **Sélecteur de version PHP**).
 5. Ouvrir `https://mailing.batterieetcompagnie.fr` et créer le compte administrateur.
 6. Dans **Réglages**, renseigner :
    - le serveur SMTP : celui indiqué par cPanel dans Comptes de messagerie → *Connect Devices* ;
@@ -96,7 +97,75 @@ L'hébergeur plafonne le nombre de mails sortants par heure. **Demandez au suppo
 
 Un contact présent dans plusieurs listes ne reçoit qu'**un seul** exemplaire d'une campagne.
 
-## 5. Bonnes pratiques et RGPD
+## 5. Synchronisation des contacts Microsoft 365
+
+L'outil peut lire directement les contacts Outlook des boîtes de l'association (`info@batterieetcompagnie.fr`, et `patrick@…` si besoin) via Microsoft Graph.
+
+Il se connecte en mode **application** : aucun compte utilisateur ni mot de passe n'est stocké. L'outil s'authentifie avec un secret propre à une application déclarée dans le tenant, et l'administrateur choisit les boîtes qu'elle peut lire.
+
+Ce que fait la synchro :
+- Elle lit les dossiers de contacts : « Contacts » et ses sous-dossiers, tous ou seulement ceux choisis.
+- Elle crée ou met à jour les contacts dans l'outil et les place dans la liste « Microsoft 365 ».
+- Chaque catégorie Outlook devient une liste « Outlook · *catégorie* » (optionnel). Exemple : catégorisez vos contacts « Bénévoles » ou « CA » dans Outlook et ciblez ces listes dans vos campagnes.
+- Un contact supprimé d'Outlook est retiré des listes synchronisées. Il n'est jamais supprimé de l'outil, et l'historique est conservé.
+- Le statut **désinscrit / en erreur** n'est jamais modifié par la synchro.
+- Elle tourne automatiquement toutes les 24 h via le cron (réglable), ou à la demande.
+
+### 5.1 Déclarer l'application dans Entra (5 minutes)
+
+1. Sur [entra.microsoft.com](https://entra.microsoft.com), aller dans **Applications**, puis **Inscriptions d'applications**, puis **Nouvelle inscription**.
+   - Nom : `Mailing Batterie & Compagnie`
+   - Types de comptes : *Comptes dans cet annuaire d'organisation uniquement*
+   - URI de redirection : laisser vide
+2. Sur la page de l'application, noter l'**ID d'application (client)** et l'**ID de l'annuaire (locataire)**.
+3. Dans **Certificats et secrets**, créer un **Nouveau secret client** (24 mois maximum). Copier tout de suite la **Valeur**, pas l'« ID du secret » : elle ne sera plus affichée.
+   Notez la date d'expiration. À échéance, la synchro affichera une erreur `AADSTS7000222` : il suffira de créer un nouveau secret et de le coller dans l'outil.
+
+### 5.2 Donner accès aux contacts — choisir UNE des deux options
+
+**Option A, recommandée : accès limité aux seules boîtes de l'association** (RBAC Exchange Online pour les applications).
+
+Ne PAS ajouter de permission « Contacts.Read » dans Entra : une permission accordée côté Entra s'appliquerait à toutes les boîtes et passerait outre la restriction.
+
+Dans Entra, ouvrir **Applications d'entreprise** → *Mailing Batterie & Compagnie* et noter son **ID d'objet**. C'est celui de l'application d'entreprise, pas celui de l'inscription d'application. Puis, en PowerShell :
+
+```powershell
+Install-Module ExchangeOnlineManagement   # une seule fois
+Connect-ExchangeOnline -UserPrincipalName patrick@batterieetcompagnie.fr
+
+$AppId    = "<ID d'application (client)>"
+$ObjectId = "<ID d'objet de l'application d'entreprise>"
+
+New-ServicePrincipal -AppId $AppId -ObjectId $ObjectId -DisplayName "Mailing Batterie & Compagnie"
+
+# Boîtes autorisées (ajouter "-or (PrimarySmtpAddress -eq '...')" pour en autoriser d'autres)
+New-ManagementScope -Name "Mailing B&C - boites" `
+  -RecipientRestrictionFilter "PrimarySmtpAddress -eq 'info@batterieetcompagnie.fr'"
+
+New-ManagementRoleAssignment -App $AppId -Role "Application Contacts.Read" `
+  -CustomResourceScope "Mailing B&C - boites"
+
+# Vérification
+Test-ServicePrincipalAuthorization -Identity $AppId -Resource info@batterieetcompagnie.fr
+```
+
+La prise en compte peut demander quelques dizaines de minutes. En attendant, le test dans l'outil renvoie « accès refusé ».
+
+**Option B, plus simple mais plus large : accès à toutes les boîtes du tenant.** À réserver à un tenant qui ne contient que l'association.
+
+Dans l'inscription d'application, aller dans **Autorisations d'API** → **Ajouter** → **Microsoft Graph** → **Autorisations d'application**. Cocher **Contacts.Read**, puis cliquer sur **Accorder un consentement d'administrateur**.
+
+### 5.3 Brancher l'outil
+
+Dans l'outil, menu **Microsoft 365** :
+1. Renseigner le tenant (ID ou `batterieetcompagnie.fr`), l'ID d'application et le secret.
+2. Indiquer la ou les boîtes à lire, puis enregistrer.
+3. Cliquer sur **Tester la connexion** : les dossiers de contacts et leur nombre de contacts s'affichent.
+4. Cliquer sur **Synchroniser maintenant**.
+
+Le secret est stocké chiffré en base, comme le mot de passe SMTP.
+
+## 6. Bonnes pratiques et RGPD
 
 - N'écrire qu'à des personnes qui ont un lien avec l'association (adhérents, bénévoles, public ayant laissé son adresse).
 - Ne jamais réabonner un contact désinscrit sans son accord explicite.
