@@ -76,6 +76,14 @@ Le tableau de bord affiche l'heure du dernier passage.
 
 *Alternative* : renseigner `cron_url_key` dans `config.php` et faire appeler `https://mailing.batterieetcompagnie.fr/cron.php?key=…` par un service externe.
 
+### Installer l'application sur téléphone ou ordinateur
+
+L'outil est une application web installable (PWA), le site doit être en HTTPS :
+- **Android / Chrome / Edge** : bouton **Installer l'application** en haut de page, ou menu ⋮ → *Installer l'application* / *Ajouter à l'écran d'accueil*.
+- **iPhone / iPad (Safari)** : bouton Partager → **Sur l'écran d'accueil**.
+
+L'application s'ouvre alors en plein écran avec son icône ; elle reste connectée au serveur (rien n'est stocké sur l'appareil hormis la feuille de style et les icônes).
+
 ### Mettre à jour
 
 cPanel → Git Version Control → **Gérer** → *Pull or Deploy* → **Update from Remote**. `config.php` et `data/` ne sont jamais écrasés.

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Installation — <?= h(APP_NAME) ?></title><link rel="stylesheet" href="assets/app.css?v=1"></head>
+<title>Installation — <?= h(APP_NAME) ?></title><?php require APP_ROOT . '/views/pwa_head.php'; ?>
+<link rel="stylesheet" href="assets/app.css?v=<?= h(APP_VERSION) ?>"></head>
 <body class="center">
 <form method="post" class="card narrow">
     <h1>Bienvenue</h1>

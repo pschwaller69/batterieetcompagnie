@@ -3,6 +3,12 @@
 Le numéro de version est affiché en bas de chaque page et dans **Réglages → Version installée**,
 avec le commit Git déployé (à comparer avec le dernier commit sur GitHub).
 
+## v1.4.0 — 20/11/2026
+- Application **installable** (PWA) : icône sur l'écran d'accueil du téléphone ou du bureau,
+  ouverture en plein écran sans barre de navigateur, raccourcis « Nouvelle campagne », « Campagnes », « Contacts ».
+- Bouton « Installer l'application » dans l'en-tête (Chrome, Edge, Android).
+- Page « Hors connexion » quand le réseau est indisponible ; affichage amélioré sur téléphone.
+
 ## v1.3.0 — 14/11/2026
 - Rôles utilisateurs : **Administrateur** (accès complet) et **Rédacteur** (contacts, listes, imports, campagnes).
   Réglages, Microsoft 365 et Utilisateurs sont réservés aux administrateurs. Les comptes existants restent administrateurs.

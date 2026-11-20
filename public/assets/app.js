@@ -110,3 +110,21 @@
     });
   };
 })();
+
+// Installation de l'application (Chrome, Edge, Android)
+(function () {
+  var btn = document.getElementById('install-btn');
+  if (!btn) { return; }
+  var deferred = null;
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferred = e;
+    btn.hidden = false;
+  });
+  btn.addEventListener('click', function () {
+    if (!deferred) { return; }
+    deferred.prompt();
+    deferred.userChoice.finally(function () { deferred = null; btn.hidden = true; });
+  });
+  window.addEventListener('appinstalled', function () { btn.hidden = true; });
+})();

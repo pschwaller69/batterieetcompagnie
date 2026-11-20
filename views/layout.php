@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title><?= h(APP_NAME) ?></title>
+<?php require APP_ROOT . '/views/pwa_head.php'; ?>
 <link rel="stylesheet" href="assets/app.css?v=<?= h(APP_VERSION) ?>">
 </head>
 <body>
@@ -21,6 +22,7 @@
             <a href="<?= url($k) ?>" class="<?= $active ? 'on' : '' ?>"><?= $label ?></a>
         <?php endforeach; ?>
     </nav>
+    <button type="button" id="install-btn" class="btn small primary" hidden>Installer l'application</button>
     <?php if ($u): ?>
     <div class="me"><a href="<?= url('account') ?>" title="Mon compte"><?= h($u['name'] ?: $u['email']) ?></a><?= is_admin($u) ? '' : ' <span class="badge">Rédacteur</span>' ?> · <a href="<?= url('logout') ?>">Déconnexion</a></div>
     <?php endif; ?>
