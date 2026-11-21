@@ -681,6 +681,24 @@ case 'm365':
     ]);
     break;
 
+case 'inbox':
+    require_login();
+    if ($isPost && post('action') === 'process') {
+        $r = inbox_process();
+        flash($r['message'], str_contains($r['message'], 'échec') ? 'err' : 'ok');
+        redirect('inbox', array_filter(['k' => get('k')]));
+    }
+    $k = get('k');
+    $kinds = ['bounce_hard', 'bounce_soft', 'complaint', 'unsubscribe', 'autoreply', 'forward', 'kept'];
+    $w = in_array($k, $kinds, true) ? 'WHERE kind = ?' : '';
+    render('inbox', [
+        'rows' => q("SELECT * FROM inbox_log $w ORDER BY id DESC LIMIT 200", $w ? [$k] : [])->fetchAll(),
+        'counts' => array_column(q("SELECT kind, COUNT(*) AS n FROM inbox_log WHERE processed_at >= datetime('now','localtime','-30 days') GROUP BY kind")->fetchAll(), 'n', 'kind'),
+        'kinds' => $kinds,
+        'filter' => $k,
+    ]);
+    break;
+
 case 'account':
     $me = require_login();
     if ($isPost) {

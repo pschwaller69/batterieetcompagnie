@@ -26,6 +26,27 @@
     <label>Nom affiché par défaut<input name="from_name" value="<?= h(setting('from_name')) ?>"></label>
     <label>Adresse de réponse par défaut<input name="reply_to" type="email" value="<?= h(setting('reply_to')) ?>"></label>
 
+    <h2>Boîte de réception (rebonds et réponses)</h2>
+    <input type="hidden" name="inbox_enabled" value="0">
+    <label class="inline"><input type="checkbox" name="inbox_enabled" value="1" <?= setting('inbox_enabled') === '1' ? 'checked' : '' ?>>
+        Relever automatiquement la boîte d'envoi (à chaque passage du cron)</label>
+    <label>Transférer les vrais messages à<input name="inbox_forward_to" type="email" value="<?= h(setting('inbox_forward_to')) ?>"></label>
+    <input type="hidden" name="inbox_archive" value="0">
+    <label class="inline"><input type="checkbox" name="inbox_archive" value="1" <?= setting('inbox_archive') === '1' ? 'checked' : '' ?>>
+        Ranger les messages traités dans le dossier « <?= INBOX_ARCHIVE_FOLDER ?> »</label>
+    <details class="small"><summary>Serveur IMAP (par défaut : celui du SMTP, port 993 SSL)</summary>
+        <div class="cols3">
+            <label>Serveur<input name="inbox_host" value="<?= h(setting('inbox_host')) ?>" placeholder="<?= h(setting('smtp_host') ?: 'comme le SMTP') ?>"></label>
+            <label>Port<input name="inbox_port" type="number" value="<?= h(setting('inbox_port')) ?>"></label>
+            <label>Chiffrement<select name="inbox_secure">
+                <?php foreach (['ssl' => 'SSL/TLS (993)', 'tls' => 'STARTTLS (143)', 'none' => 'Aucun'] as $k => $v): ?>
+                <option value="<?= $k ?>" <?= setting('inbox_secure') === $k ? 'selected' : '' ?>><?= $v ?></option>
+                <?php endforeach; ?>
+            </select></label>
+        </div>
+        <p class="muted">Identifiant et mot de passe : ceux du SMTP ci-dessus.</p>
+    </details>
+
     <h2>Cadence d'envoi</h2>
     <div class="cols3">
         <label>Max / heure<input name="hourly_limit" type="number" min="1" value="<?= h(setting('hourly_limit')) ?>"></label>

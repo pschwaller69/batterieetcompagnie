@@ -22,6 +22,12 @@ const SETTING_DEFAULTS = [
     'link_website' => 'https://batterieetcompagnie.fr/',
     'link_facebook' => 'https://www.facebook.com/share/1FUMjpGqDe/',
     'link_instagram' => 'https://www.instagram.com/batterie_et_compagnie/',
+    'inbox_enabled' => '1',
+    'inbox_host' => '',                  // vide = même serveur que le SMTP
+    'inbox_port' => '993',
+    'inbox_secure' => 'ssl',
+    'inbox_forward_to' => 'info@batterieetcompagnie.fr',
+    'inbox_archive' => '1',
 ];
 
 /** Réglages de la synchronisation Microsoft 365 (page dédiée). */

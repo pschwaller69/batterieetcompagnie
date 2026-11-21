@@ -119,6 +119,20 @@ SQL,
         3 => <<<SQL
 ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'admin'; -- admin | editor
 SQL,
+        4 => <<<SQL
+ALTER TABLE contacts ADD COLUMN soft_bounces INTEGER NOT NULL DEFAULT 0;
+CREATE TABLE inbox_log (
+    id INTEGER PRIMARY KEY,
+    uid INTEGER,
+    processed_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),
+    received_at TEXT,
+    from_addr TEXT NOT NULL DEFAULT '',
+    subject TEXT NOT NULL DEFAULT '',
+    kind TEXT NOT NULL,
+    detail TEXT NOT NULL DEFAULT ''
+);
+CREATE INDEX idx_inbox_log_kind ON inbox_log(kind, processed_at);
+SQL,
     ];
     foreach ($migrations as $v => $sql) {
         if ($version < $v) {

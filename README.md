@@ -107,6 +107,22 @@ L'hébergeur plafonne le nombre de mails sortants par heure. **Demandez au suppo
 
 Un contact présent dans plusieurs listes ne reçoit qu'**un seul** exemplaire d'une campagne.
 
+## 4 bis. Rebonds et réponses (boîte `info@m…`)
+
+À chaque passage du cron, l'outil relève en IMAP la boîte d'envoi (mêmes identifiants que le SMTP, port 993) et traite les messages non lus (menu **Réception**) :
+
+| Message reçu | Action |
+|---|---|
+| Rebond définitif (adresse inexistante) | contact « en erreur », message de campagne marqué en échec |
+| Rebond temporaire (boîte pleine…) | compteur ; « en erreur » au 3e |
+| Signalement spam (rapport FBL) / mail « désinscription » | contact désinscrit |
+| Réponse automatique (absence…) | classée, pas de transfert |
+| Vrai message | transféré à `info@batterieetcompagnie.fr` (Répondre = écrire à l'expéditeur ; original en pièce jointe) |
+
+Les messages traités sont rangés dans le dossier **Archives-mailing** de la boîte (consultable dans le webmail). Réglages → « Boîte de réception » pour désactiver, changer l'adresse de transfert ou le serveur IMAP.
+
+Les mailings n'apparaissent pas dans « Éléments envoyés » : l'envoi passe directement par SMTP. Le suivi est dans **Campagnes → Destinataires**.
+
 ## 5. Synchronisation des contacts Microsoft 365
 
 L'outil peut lire directement les contacts Outlook des boîtes de l'association (`info@batterieetcompagnie.fr`, et `patrick@…` si besoin) via Microsoft Graph.
@@ -180,7 +196,7 @@ Le secret est stocké chiffré en base, comme le mot de passe SMTP.
 - N'écrire qu'à des personnes qui ont un lien avec l'association (adhérents, bénévoles, public ayant laissé son adresse).
 - Ne jamais réabonner un contact désinscrit sans son accord explicite.
 - Les adresses qui rebondissent passent « en erreur » et sont exclues des envois suivants.
-- Les retours différés, ceux que le serveur du destinataire renvoie après coup, arrivent dans la boîte `info@m.batterieetcompagnie.fr`. Les consulter de temps en temps et passer les contacts concernés « en erreur ».
+- Les retours différés sont traités automatiquement par la relève de la boîte (voir 4 bis).
 - Sauvegarde : le fichier `data/mailing.sqlite` contient toutes les données. Il est inclus dans les sauvegardes o2switch (JetBackup).
 
 ## Sécurité

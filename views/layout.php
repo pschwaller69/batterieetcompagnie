@@ -13,7 +13,7 @@
 <header class="top">
     <a class="brand" href="<?= url('dashboard') ?>"><span class="logo">B&amp;C</span> Mailing</a>
     <nav>
-        <?php $nav = ['dashboard' => 'Accueil', 'campaigns' => 'Campagnes', 'contacts' => 'Contacts', 'lists' => 'Listes', 'import' => 'Importer'];
+        <?php $nav = ['dashboard' => 'Accueil', 'campaigns' => 'Campagnes', 'contacts' => 'Contacts', 'lists' => 'Listes', 'import' => 'Importer', 'inbox' => 'Réception'];
         if ($u && is_admin($u)) {
             $nav += ['m365' => 'Microsoft 365', 'settings' => 'Réglages'];
         }

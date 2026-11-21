@@ -217,6 +217,18 @@ class SmtpSender
         }
     }
 
+    /** Objet PHPMailer configuré et vidé, pour un envoi particulier (transfert…). */
+    public function fresh(): PHPMailer
+    {
+        $m = $this->mail;
+        $m->clearAllRecipients();
+        $m->clearReplyTos();
+        $m->clearCustomHeaders();
+        $m->clearAttachments();
+        $m->Body = $m->AltBody = $m->Subject = '';
+        return $m;
+    }
+
     public function close(): void
     {
         try {

@@ -3,6 +3,15 @@
 Le numéro de version est affiché en bas de chaque page et dans **Réglages → Version installée**,
 avec le commit Git déployé (à comparer avec le dernier commit sur GitHub).
 
+## v1.6.0 — 21/11/2026
+- **Relève automatique de la boîte d'envoi** (`info@m…`) à chaque passage du cron, menu **Réception** :
+  - rebonds définitifs → contact « en erreur » (et message de la campagne marqué en échec) ;
+  - rebonds temporaires (boîte pleine…) → « en erreur » au 3e ;
+  - signalements spam et mails « désinscription » → contact désinscrit ;
+  - réponses automatiques (absences…) → classées sans transfert ;
+  - vrais messages → transférés à info@batterieetcompagnie.fr (Répondre = répondre à l'expéditeur, original joint).
+- Messages traités rangés dans le dossier « Archives-mailing » de la boîte.
+
 ## v1.5.0 — 21/11/2026
 - Liens **Site web · Facebook · Instagram** en pied de chaque mail (version HTML et texte),
   modifiables dans Réglages → « Liens en pied de mail ».

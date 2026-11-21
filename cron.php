@@ -15,5 +15,11 @@ save_setting('last_cron_run', now());
 if (($m = m365_maybe_autosync()) !== null) {
     echo '[' . now() . '] ' . $m . PHP_EOL;
 }
+if (inbox_configured()) {
+    $i = inbox_process();
+    if ($i['processed'] || str_contains($i['message'], 'échec')) {
+        echo '[' . now() . '] ' . $i['message'] . PHP_EOL;
+    }
+}
 $r = process_queue();
 echo '[' . now() . '] ' . $r['message'] . PHP_EOL;
