@@ -83,6 +83,20 @@ function build_email(array $campaign, array $contact, string $messageToken, bool
         ? '<img src="' . h($logo) . '" alt="' . h($org) . '" style="max-width:220px;max-height:90px;height:auto;display:inline-block;">'
         : '<span style="font-size:22px;font-weight:bold;color:#ffffff;">' . h($org) . '</span>';
     $footerExtra = setting('footer_html');
+    $links = [];
+    foreach (['link_website' => 'Site web', 'link_facebook' => 'Facebook', 'link_instagram' => 'Instagram'] as $k => $label) {
+        $u = trim(setting($k));
+        if ($u !== '' && preg_match('#^https?://#i', $u)) {
+            $links[$label] = $u;
+        }
+    }
+    $linksHtml = '';
+    $linksText = '';
+    foreach ($links as $label => $u) {
+        $linksHtml .= ($linksHtml ? ' &nbsp;·&nbsp; ' : '')
+            . '<a href="' . h($u) . '" style="color:' . h($brand) . ';font-weight:bold;text-decoration:none;">' . h($label) . '</a>';
+        $linksText .= "\n" . $label . ' : ' . $u;
+    }
     $address = setting('org_address');
     $pixel = '';
     if (!$isTest && (int)($campaign['track_opens'] ?? 0) === 1 && $base !== '') {
@@ -101,6 +115,7 @@ function build_email(array $campaign, array $contact, string $messageToken, bool
         . '<tr><td align="center" style="background:' . h($brand) . ';padding:18px 24px;font-family:Arial,Helvetica,sans-serif;">' . $header . '</td></tr>'
         . '<tr><td style="padding:24px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.55;color:#222222;">' . $content . '</td></tr>'
         . '<tr><td style="padding:16px 24px;background:#fafafa;border-top:1px solid #eeeeee;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.5;color:#777777;" align="center">'
+        . ($linksHtml !== '' ? '<div style="font-size:14px;margin:0 0 10px 0;">' . $linksHtml . '</div>' : '')
         . '<strong>' . h($org) . '</strong>' . ($address !== '' ? '<br>' . nl2br(h($address)) : '')
         . ($footerExtra !== '' ? '<br>' . $footerExtra : '')
         . '<br><br>Vous recevez ce message car vous êtes en contact avec ' . h($org) . '.<br>'
@@ -109,7 +124,7 @@ function build_email(array $campaign, array $contact, string $messageToken, bool
         . '</td></tr></table></body></html>';
 
     $text = html_to_text($content)
-        . "\n\n--\n" . $org . ($address !== '' ? "\n" . $address : '')
+        . "\n\n--\n" . $org . ($address !== '' ? "\n" . $address : '') . $linksText
         . "\nSe désinscrire : " . $unsubUrl . "\n";
 
     return ['subject' => $subject, 'html' => $html, 'text' => $text, 'unsubscribe_url' => $unsubUrl];

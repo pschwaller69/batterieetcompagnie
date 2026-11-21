@@ -40,6 +40,11 @@
     <h2>Association</h2>
     <label>Nom<input name="org_name" value="<?= h(setting('org_name')) ?>"></label>
     <label>Adresse postale <small class="muted">(affichée en pied de mail)</small><textarea name="org_address" rows="2"><?= h(setting('org_address')) ?></textarea></label>
+    <h2>Liens en pied de mail</h2>
+    <label>Site web<input name="link_website" type="url" value="<?= h(setting('link_website')) ?>" placeholder="https://…"></label>
+    <label>Facebook<input name="link_facebook" type="url" value="<?= h(setting('link_facebook')) ?>" placeholder="https://www.facebook.com/…"></label>
+    <label>Instagram<input name="link_instagram" type="url" value="<?= h(setting('link_instagram')) ?>" placeholder="https://www.instagram.com/…"></label>
+    <p class="small muted">Laisser un champ vide pour masquer le lien.</p>
     <label>Texte libre du pied de mail <small class="muted">(HTML autorisé : site web, réseaux…)</small><textarea name="footer_html" rows="3"><?= h(setting('footer_html')) ?></textarea></label>
 
     <h2>Apparence</h2>

@@ -4,7 +4,7 @@ declare(strict_types=1);
 /**
  * Version de l'application. À incrémenter à chaque livraison (voir CHANGELOG.md).
  */
-const APP_VERSION = '1.4.0';
+const APP_VERSION = '1.5.0';
 
 /**
  * Commit Git réellement déployé, lu directement dans .git (déploiement via cPanel « Git Version Control »).

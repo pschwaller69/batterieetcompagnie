@@ -3,6 +3,10 @@
 Le numéro de version est affiché en bas de chaque page et dans **Réglages → Version installée**,
 avec le commit Git déployé (à comparer avec le dernier commit sur GitHub).
 
+## v1.5.0 — 21/11/2026
+- Liens **Site web · Facebook · Instagram** en pied de chaque mail (version HTML et texte),
+  modifiables dans Réglages → « Liens en pied de mail ».
+
 ## v1.4.0 — 20/11/2026
 - Application **installable** (PWA) : icône sur l'écran d'accueil du téléphone ou du bureau,
   ouverture en plein écran sans barre de navigateur, raccourcis « Nouvelle campagne », « Campagnes », « Contacts ».

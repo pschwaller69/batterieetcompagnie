@@ -19,6 +19,9 @@ const SETTING_DEFAULTS = [
     'brand_color' => '#b3261e',
     'logo_url' => '',
     'footer_html' => '',
+    'link_website' => 'https://batterieetcompagnie.fr/',
+    'link_facebook' => 'https://www.facebook.com/share/1FUMjpGqDe/',
+    'link_instagram' => 'https://www.instagram.com/batterie_et_compagnie/',
 ];
 
 /** Réglages de la synchronisation Microsoft 365 (page dédiée). */
